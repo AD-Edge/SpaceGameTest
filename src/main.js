@@ -215,16 +215,15 @@ function buttonRender(ct, id) {
       }
 }
 function sceneSwitch() {
-        if(sceneChange == 1) { 
+        if(sceneChange == 1) { //PLAY GAME
             gameState = 1; 
             stateInit = true;
-        } else if (sceneChange == 2) { 
-            gameState = 2; 
-            stateInit = true;
-        } else if (sceneChange == 4) { gameState = 0; 
-        
+        } else if (sceneChange == 2) { //Credits GOTO 
+            gameState = 2;
+        } else if (sceneChange == 4) { //Credits BACK  
+            gameState = 0; //just switch back, dont reset
         }        
-        //reset
+        //reset trigger
         sceneChange = -1;
 }
 
@@ -366,7 +365,9 @@ function buttonActions(typ) {
     } else if (riBool == true) {
         playerSprite.x += mvSpd;
     } else if (qtBool == true) {
+        //switch game state back
         gameState = 0;
+        stateInit = true; //reinitialize
     }
 
 }
@@ -438,19 +439,24 @@ function GameUpdate() {
 }
 
 function ClearObjects() {
-    console.log('clear objects');
+    //console.log('clear blocks[] of length: ' + blocks.length);
+    
     for (var i = 0; i <= blocks.length - 1; i++) {
-        console.log('removing object from blocks');
-        blocks[i].isActive = false
-        blocks[i].remove()
+        //console.log('removing object from blocks');
+        blocks[i].isActive = false;
+        //blocks[i].remove();
     }
     blocks.length = 0;
     blocks = [];
+    
+    //console.log('blocks[] now length: ' + blocks.length);
 
 }
 
 //Menu State Setup
 function initMenuState() {
+    console.log('init menu state');
+
     //reset canvas
     context.clearRect(0,0, canvas.width, canvas.height);
     //clear objects
@@ -466,6 +472,8 @@ function initMenuState() {
 
 //Game State Setup
 function initGameState() {
+    console.log('init game state');
+
     //reset canvas
     context.clearRect(0,0, canvas.width, canvas.height);
 
@@ -519,6 +527,7 @@ function initGameState() {
 const loop = GameLoop({
     update: () => {
 
+        //Run timer & check for scene switch
         if(sceneChange != -1) {
             if(timer > 0) {
                 timer -= 0.1;
@@ -533,7 +542,6 @@ const loop = GameLoop({
             if(stateInit == true) {
                 stateInit = false; 
                 initMenuState();
-                //initGameState();
             }
 
         } else if (gameState == 1) { //GAME
