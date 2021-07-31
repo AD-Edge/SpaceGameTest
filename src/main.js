@@ -17,7 +17,7 @@ const { init, GameLoop, Button, Text, Grid,
 //get components from index
 const { canvas, context } = init();
 // console.log(canvas);
-// console.log(context);
+console.log(context);
 
 //Initilize interactions
 initPointer();
@@ -27,8 +27,10 @@ kontra.initKeys();
 // var arrows = [37,38,39,40];
 
 //Setup
-var grid = 8;
 var playerSprite = null;
+var rocketSheet = null;
+var rSprite = null;
+var grid = 8;
 var mvSpd = 0.6;
 var numRows = canvas.height / grid;
 var numCols = canvas.width / grid;
@@ -45,7 +47,7 @@ var stateInit = true; //start true to not trigger
 //0 = Intro Page
 //1 = Game 
 //2 = Credits
-//3 = Death/Restart
+//3 = Gameover
 var gameState = 0;
 
 //button states 
@@ -77,117 +79,24 @@ rocketImage.onload = () => {
 };
 
 //Text and Buttons
-let textStyle = { 
-    color: 'white',
-    font: '16px Arial, sans-serif'
-};
-let title = Text({
-    text: '[SpaceGame.js]',
-    color: '#999999',
-    font: '16px Arial, bold, sans-serif'
-});
-let credits = Text({
-    text: ' \n Game test by\n Alex Delderfield\n\n Made using Kontra.js\n 2021',
-    color: 'black',
-    font: '12px Arial, bold, sans-serif'
-});
-let startButton = Button({
-    text: {
-        text: 'Play',
-        ...textStyle
-    },
-    render() {
-        buttonRender(this, 1);
-    }
-});
-let credButton = Button({
-    text: {
-        text: 'Credits',
-        ...textStyle
-    },
-    render() {
-        buttonRender(this, 2);
-    }
-});
-let quitButton = Button({ //not used
-    text: {
-        text: 'Quit',
-        ...textStyle
-    },
-    render() {
-        buttonRender(this, 3);
-    }
-});
-let backButton = Button({
-    x: 1,
-    y: 110,
-    text: {
-        text: 'Back',
-        ...textStyle
-    },
-    render() {
-        buttonRender(this, 4);
-    }
-});
+let textStyle = null;
+let title = null;
+let credits = null;
+let startButton = null;
+let credButton = null;
+let quitButton = null;
+let backButton = null;
 
 //Main Menu Grid Interface
-let menuGrid = Grid({
-    x: 64,
-    y: 65,
-    anchor: {x: 0.5, y: 0.5},
-
-    rowGap: 6,
-
-    justify: 'center',
-
-    children: [title, startButton, credButton]
-
-});
+let menuGrid = null;
 
 //Lower Controls Area (GAME)
-const CTRLArea = Sprite({
-    x: 0,
-    y: canvas.height/2,
-    width: canvas.width,
-    height: canvas.height/2,
-    
-    render() {
-        this.context.setLineDash([]);
-        this.context.lineWidth = 3;
-        this.context.strokeStyle = 'grey';
-        this.context.strokeRect(0, 0, this.width, this.height);
-    }
-});
-const CTRLCol = Sprite({
-    x: 0,
-    y: 0,
-    color: 'black',
-    width: CTRLArea.width,
-    height: CTRLArea.height,
-});
+let CTRLArea = null;
+let CTRLCol = null;
 
 //Lower Controls Area (MENU)
-const CTRLAreaMenu = Sprite({
-    x: 0,
-    y: canvas.height/2,
-    width: canvas.width,
-    height: canvas.height/2,
-    
-    render() {
-        this.context.setLineDash([]);
-        this.context.lineWidth = 3;
-        this.context.strokeStyle = 'grey';
-        this.context.strokeRect(0, 0, this.width, this.height);
-    }
-});
-const CTRLColMenu = Sprite({
-    x: 0,
-    y: 0,
-    color: 'black',
-    width: CTRLAreaMenu.width,
-    height: CTRLAreaMenu.height,
-});
-
+let CTRLAreaMenu = null;
+let CTRLColMenu = null;
 
 //Multi-function button trigger for navigation
 function buttonRender(ct, id) {
@@ -313,42 +222,42 @@ function createCTRLButtonTxt(xIn, yIn, txt, ox, oy, c, sSub) {
 }
 
 function createGameButtons() {
-    createCTRLButton(44, 3, '🢕', 0, -5, keyUp, keyUpds, 0);
-    createCTRLButton(44, 85, '🢗', 0, 15, keyDown, keyDownds, 0);
-    createCTRLButton(3, 44, '🢔', 0, 5, keyLeft, keyLeftds, 0);
-    createCTRLButton(85, 44, '🢖', 4, 5, keyRight, keyRightds, 0);
+    createCTRLButton(44, 3, 'up', 0, -5, keyUp, keyUpds, 0);
+    createCTRLButton(44, 85, 'dn', 0, 15, keyDown, keyDownds, 0);
+    createCTRLButton(3, 44, 'lf', 0, 5, keyLeft, keyLeftds, 0);
+    createCTRLButton(85, 44, 'ri', 4, 5, keyRight, keyRightds, 0);
     
     createCTRLButtonTxt(3, 94, '⎋', -8, -2, 'grey', 10);
     
 }
 function createOffGameButtons() {
-    createOffButton(44, 3, '#333333', 0);
-    createOffButton(44, 85, '#333333', 0);
-    createOffButton(3, 44, '#333333', 0);
-    createOffButton(85, 44, '#333333', 0);
-    createOffButton(3, 94, '#222222', 10);
+    createOffButton(44, 3, '#222222', 0);
+    createOffButton(44, 85, '#222222', 0);
+    createOffButton(3, 44, '#222222', 0);
+    createOffButton(85, 44, '#222222', 0);
+    createOffButton(3, 94, '#111111', 10);
 }
 function buttonPress(typ) {
-    if(typ == '🢕') {
+    if(typ == 'up') {
         upBool = true;
-    } else if (typ == '🢗') {
+    } else if (typ == 'dn') {
         dnBool = true;
-    } else if (typ == '🢔') {
+    } else if (typ == 'lf') {
         lfBool = true;
-    } else if (typ == '🢖') {
+    } else if (typ == 'ri') {
         riBool = true;
     } else if (typ == '⎋') {
         qtBool = true;
     }
 }
 function buttonEnd(typ) {
-    if(typ == '🢕') {
+    if(typ == 'up') {
         upBool = false;
-    } else if (typ == '🢗') {
+    } else if (typ == 'dn') {
         dnBool = false;
-    } else if (typ == '🢔') {
+    } else if (typ == 'lf') {
         lfBool = false;
-    } else if (typ == '🢖') {
+    } else if (typ == 'ri') {
         riBool = false;
     } else if (typ == '⎋') {
         qtBool = false;
@@ -438,9 +347,12 @@ function GameUpdate() {
     }
 }
 
-function ClearObjects() {
+function ClearGameObjects() {
     //console.log('clear blocks[] of length: ' + blocks.length);
     
+    CTRLArea = null;
+    CTRLCol = null;
+
     for (var i = 0; i <= blocks.length - 1; i++) {
         //console.log('removing object from blocks');
         blocks[i].isActive = false;
@@ -452,21 +364,127 @@ function ClearObjects() {
     //console.log('blocks[] now length: ' + blocks.length);
 
 }
+function ClearMenuObjects() {
+    //TODO - add these objects to a list
+    //Then just for-loop that list
+    
+    //Main UI objects
+    CTRLAreaMenu = null;
+    CTRLColMenu = null;
+    //objects
+    textStyle = null;
+    title = null;
+    credits = null;
+    startButton = null;
+    credButton = null;
+    quitButton = null;
+    backButton = null;
+    //Menu Grid Interface
+    menuGrid = null;
+}
 
 //Menu State Setup
 function initMenuState() {
     console.log('init menu state');
-
-    //reset canvas
-    context.clearRect(0,0, canvas.width, canvas.height);
-    //clear objects
-    ClearObjects();
     
+    //clear objects
+    ClearGameObjects();
+    
+    //Lower Controls Area (MENU)
+    CTRLAreaMenu = Sprite({
+        x: 0,
+        y: canvas.height/2,
+        width: canvas.width,
+        height: canvas.height/2,
+        
+        render() {
+            this.context.setLineDash([]);
+            this.context.lineWidth = 3;
+            this.context.strokeStyle = 'grey';
+            this.context.strokeRect(0, 0, this.width, this.height);
+        }
+    });
+    CTRLColMenu = Sprite({
+        x: 0,
+        y: 0,
+        color: 'black',
+        width: CTRLAreaMenu.width,
+        height: CTRLAreaMenu.height,
+    });
     //Create game controls panel
     CTRLAreaMenu.addChild(CTRLColMenu);
 
+    //Text and Buttons
+    textStyle = { 
+        color: 'white',
+        font: '16px Arial, sans-serif'
+    };
+    title = Text({
+        text: '[SpaceGame.js]',
+        color: '#999999',
+        font: '16px Arial, bold, sans-serif'
+    });
+    credits = Text({
+        text: ' \n Game test by\n Alex Delderfield\n\n Made using Kontra.js\n 2021',
+        color: 'black',
+        font: '12px Arial, bold, sans-serif'
+    });
+    startButton = Button({
+        text: {
+            text: 'Play',
+            ...textStyle
+        },
+        render() {
+            buttonRender(this, 1);
+        }
+    });
+    credButton = Button({
+        text: {
+            text: 'Credits',
+            ...textStyle
+        },
+        render() {
+            buttonRender(this, 2);
+        }
+    });
+    // quitButton = Button({ //not used
+    //     text: {
+    //         text: 'Quit',
+    //         ...textStyle
+    //     },
+    //     render() {
+    //         buttonRender(this, 3);
+    //     }
+    //});
+    backButton = Button({
+        x: 1,
+        y: 110,
+        text: {
+            text: 'Back',
+            ...textStyle
+        },
+        render() {
+            buttonRender(this, 4);
+        }
+    });
+
+    //Main Menu Grid Interface
+    menuGrid = Grid({
+        x: 64,
+        y: 65,
+        anchor: {x: 0.5, y: 0.5},
+
+        rowGap: 6,
+
+        justify: 'center',
+
+        children: [title, startButton, credButton]
+
+    });
+
     //Todo, create and destroy depening on game scene???????????????????????????????
     createOffGameButtons();
+    
 
 }
 
@@ -474,14 +492,31 @@ function initMenuState() {
 function initGameState() {
     console.log('init game state');
 
-    //reset canvas
-    context.clearRect(0,0, canvas.width, canvas.height);
+    ClearMenuObjects();
 
+    //initilize variables
+    CTRLArea = Sprite({
+        x: 0,
+        y: canvas.height/2,
+        width: canvas.width,
+        height: canvas.height/2,
+        
+        render() {
+            this.context.setLineDash([]);
+            this.context.lineWidth = 3;
+            this.context.strokeStyle = 'grey';
+            this.context.strokeRect(0, 0, this.width, this.height);
+        }
+    });
+    CTRLCol = Sprite({
+        x: 0,
+        y: 0,
+        color: 'black',
+        width: CTRLArea.width,
+        height: CTRLArea.height,
+    });
     //create game controls panel
     CTRLArea.addChild(CTRLCol);
-
-    //now load Game Buttons
-    createGameButtons();
 
     //create player
     //main menu
@@ -493,7 +528,7 @@ function initGameState() {
         dy: 0,
     });
 
-    let rocketSheet = SpriteSheet({
+    rocketSheet = SpriteSheet({
         image: rocketImage,
         frameWidth: 36,
         frameHeight: 32,
@@ -506,7 +541,7 @@ function initGameState() {
         }
     });
 
-    let rSprite = Sprite({
+    rSprite = Sprite({
         x: -3,
         y: 9,
         animations: rocketSheet.animations
@@ -520,6 +555,10 @@ function initGameState() {
     for (let i=0; i < 5; i++) {
         createFallBlock();
     }
+    
+    //now load Game Buttons
+    createGameButtons();
+
 }
 
 //GameLoop setup
@@ -538,14 +577,15 @@ const loop = GameLoop({
 
         if(gameState == 0) { //MENU
 
-            //Run Initial Menu Setup
+            //Initialize Menu
             if(stateInit == true) {
-                stateInit = false; 
+                stateInit = false;
                 initMenuState();
             }
 
         } else if (gameState == 1) { //GAME
 
+            //Initilize Game
             if(stateInit == true) {
                 stateInit = false; 
                 initGameState();
@@ -554,21 +594,35 @@ const loop = GameLoop({
             GameUpdate();
 
         } else if (gameState == 2) { //CREDITS
-
+            
         } else if (gameState == 3) { //GAMEOVER
 
         }
     },
     render: () => {
+
         if(gameState == 0) { //MENU
 
-            //render menu
-            menuGrid.render();
-            //render disabled buttons
-            CTRLAreaMenu.render(); 
+            //Refresh
+            if(stateInit == true) {
+                context.clearRect(0,0, canvas.width, canvas.height);
+            }
 
-        }else if (gameState == 1) { //GAME
+            //render menu
+            if(menuGrid) {
+                menuGrid.render();
+            }
+            //render disabled buttons
+            if(CTRLAreaMenu) {
+                CTRLAreaMenu.render(); 
+            }
+        } else if (gameState == 1) { //GAME
             
+            //Refresh
+            if(stateInit == true) {
+                context.clearRect(0,0, canvas.width, canvas.height);
+            }
+
             if(playerSprite) {
                 playerSprite.render();
             }
@@ -584,7 +638,9 @@ const loop = GameLoop({
         } else if (gameState == 3) { //GAMEOVER
 
             //render disabled buttons
-            CTRLAreaMenu.render();
+            if(CTRLArea) {
+                CTRLAreaMenu.render();
+            }
 
         }
     },
