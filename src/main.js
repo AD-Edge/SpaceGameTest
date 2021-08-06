@@ -40,6 +40,7 @@ var blocks = [];
 
 //Scene stuff
 var timer = 0;
+var timerQ = 0;
 var sceneChange = -1;
 var stateInit = true; //start true to not trigger
 
@@ -200,21 +201,23 @@ function createCTRLButtonTxt(xIn, yIn, txt, ox, oy, c, sSub) {
             font: '30px Arial, sans-serif',
         },
         onDown() {
-            buttonPress(txt)
+            qtBool = true;
+            timerQ = 0.75; //set delay for transition
             this.color = 'grey'
+            //buttonPress(txt) //moved to gameloop
             //this.y +=2;
         },
         onUp() {
             this.color = c
             //this.y -=2;
-            buttonEnd(txt)
+            //buttonEnd(txt)
         },
         onOver() {
             this.color = '#DDDDDD'
         },
         onOut: function() {
             this.color = c
-            buttonEnd(txt)
+            //buttonEnd(txt)
         }
     });
     track(gridSQRbut);
@@ -247,7 +250,7 @@ function buttonPress(typ) {
     } else if (typ == 'ri') {
         riBool = true;
     } else if (typ == '⎋') {
-        qtBool = true;
+        //qtBool = true;
     }
 }
 function buttonEnd(typ) {
@@ -273,11 +276,12 @@ function buttonActions(typ) {
         playerSprite.x -= mvSpd;
     } else if (riBool == true) {
         playerSprite.x += mvSpd;
-    } else if (qtBool == true) {
-        //switch game state back
-        gameState = 0;
-        stateInit = true; //reinitialize
-    }
+    } 
+    //else if (qtBool == true) {
+    //     //switch game state back
+    //     gameState = 0;
+    //     stateInit = true; //reinitialize
+    // }
 
 }
 
@@ -386,7 +390,14 @@ function ClearMenuObjects() {
 //Menu State Setup
 function initMenuState() {
     console.log('init menu state');
-    
+
+    //reset exit button
+    // upBool = false;
+    // dnBool = false;
+    // lfBool = false;
+    // riBool = false;
+    qtBool = false;
+
     //clear objects
     ClearGameObjects();
     
@@ -492,6 +503,13 @@ function initMenuState() {
 function initGameState() {
     console.log('init game state');
 
+    //reset exit button
+    // upBool = false;
+    // dnBool = false;
+    // lfBool = false;
+    // riBool = false;
+    qtBool = false;
+
     ClearMenuObjects();
 
     //initilize variables
@@ -572,6 +590,23 @@ const loop = GameLoop({
                 timer -= 0.1;
             } else {
                 sceneSwitch();
+            }
+        }
+
+        if(qtBool == true) {
+            if(timerQ > 0) {
+                timerQ -= 0.1;
+            } else {
+                //reset
+                qtBool = false; 
+                
+                //go back 
+                //buttonPress('⎋');
+                
+                gameState = 0;
+                stateInit = true; //reinitialize
+                
+    
             }
         }
 
