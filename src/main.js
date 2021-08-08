@@ -11,6 +11,9 @@ this is likely what ill do for js13k to save on files/data...
 *laughs* Single-responsibility principle has no powar here**
 */
 
+//for later, dynamic resize?
+//canvasObject.setAttribute('width', '475');
+
 const { init, GameLoop, Button, Text, Grid, 
   SpriteSheet, Sprite, initPointer, track } = kontra;
 
