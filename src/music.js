@@ -6,19 +6,42 @@
 //     zzfx(...[.7,.1,530,.08,.01,.3,2,.93,,.5,,,.15,5,,1,,.99,.001,.27]); // Explosion 30
 // }
 
-import { sanxion } from '/assets/music/sanxion.js';
+export function muteOn() {
+    node.stop();
+}
+export function muteOff() {
+    buffer = zzfxM(...songData2);
+    node = zzfxP(...buffer);
+}
 
-import { sanxion2 } from '/assets/music/sanxion2.js';
+let node = null;
+
+import { sanxion } from '../assets/music/sanxion.js';
+import { sanxion2 } from '../assets/music/sanxion2.js';
+
+let buffer = null;
 
 const songData = sanxion;
 const songData2 = sanxion2;
 
-const buffer = zzfxM(...songData);
+
 
 //Play Song
-const node = zzfxP(...buffer);
-
 //node.stop();
+//buffer = zzfxM(...songData2);
+//const node = zzfxP(...buffer);
+
+
+//ref https://github.com/keithclark/ZzFXM/blob/master/examples/song-player/index.html
+
+
+//console.log('not playing music yet');
+
+// This reduces CPU usage when a song isn't playing
+// zzfxX.suspend();
+// stop();
+// setSong();
+
 
 //if (player.hit(enemy)) {
 // if(init) {

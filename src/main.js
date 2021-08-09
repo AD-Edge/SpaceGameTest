@@ -14,7 +14,7 @@ this is likely what ill do for js13k to save on files/data...
 //for later, dynamic resize?
 //canvasObject.setAttribute('width', '475');
 
-//import { sfxPlayButton, sfxPlayPuff } from './music.js';
+import { muteOn, muteOff } from './music.js';
 
 const { init, GameLoop, Button, Text, Grid, 
   SpriteSheet, Sprite, initPointer, track } = kontra;
@@ -46,7 +46,7 @@ var numCols = canvas.width / grid;
 var blocks = [];
 var blocksB = [];
 
-//Scene stuff
+//Scene stuff 
 var timer = 0;
 var timerQ = 0;
 var sceneChange = -1;
@@ -65,6 +65,8 @@ var dnBool = false;
 var lfBool = false;
 var riBool = false;
 var qtBool = false;
+
+var mute = false;
 
 //Load/Create Image Sprites
 const playerImg = new Image();
@@ -217,6 +219,8 @@ function createCTRLButtonTxt(xIn, yIn, txt, ox, oy, c, sSub) {
             qtBool = true;
             timerQ = 0.75; //set delay for transition
             this.color = 'grey'
+
+            muteOn(); //stop music
             sfxPlayButton(); //sfx
             //buttonPress(txt) //moved to gameloop
             //this.y +=2;
@@ -238,13 +242,68 @@ function createCTRLButtonTxt(xIn, yIn, txt, ox, oy, c, sSub) {
     CTRLArea.addChild(gridSQRbut);
 }
 
+function createCTRLButtonSound(xIn, yIn, txt, ox, oy, c, sSub, parnt) {
+    const gridSQRbut = Button({
+        x: xIn,
+        y: yIn,
+        color: c,
+        width: 40-sSub,
+        height: 40-sSub,
+
+        // text properties
+        text: {
+            x: 12 + ox,
+            y: 0 + oy,
+            text: txt,
+            color: 'black',
+            font: '20px Arial, sans-serif',
+        },
+        onDown() {
+            //timerQ = 0.75; //set delay for transition
+            sfxPlayButton(); //sfx
+            this.color = 'grey'
+            
+            if(!mute) {
+                this.text = '🔇';
+                muteOn();
+                mute = true;
+            } else {
+                //console.log('mute');
+                this.text = '🔊';
+                muteOff();
+                mute = false;
+                
+            }
+        },
+        onUp() {
+            this.color = c
+            //this.y -=2;
+            //buttonEnd(txt)
+        },
+        onOver() {
+            this.color = '#DDDDDD'
+        },
+        onOut: function() {
+            this.color = c
+            //buttonEnd(txt)
+        }
+    });
+    track(gridSQRbut);
+    parnt.addChild(gridSQRbut);
+}
+
 function createGameButtons() {
     createCTRLButton(44, 3, 'up', 0, -5, keyUp, keyUpds, 0);
     createCTRLButton(44, 85, 'dn', 0, 15, keyDown, keyDownds, 0);
     createCTRLButton(3, 44, 'lf', 0, 5, keyLeft, keyLeftds, 0);
     createCTRLButton(85, 44, 'ri', 4, 5, keyRight, keyRightds, 0);
     
-    createCTRLButtonTxt(3, 94, '⎋', -8, -2, 'grey', 10);
+    createCTRLButtonTxt(3, 94, '↺', -8, 2, 'grey', 10);
+    if(mute) {
+        createCTRLButtonSound(94, 94, '🔇', -10, 5, 'grey', 10, CTRLArea);
+    } else {
+        createCTRLButtonSound(94, 94, '🔊', -10, 5, 'grey', 10, CTRLArea);
+    }
     
 }
 function createOffGameButtons() {
@@ -253,6 +312,13 @@ function createOffGameButtons() {
     createOffButton(3, 44, '#222222', 0);
     createOffButton(85, 44, '#222222', 0);
     createOffButton(3, 94, '#111111', 10);
+
+    if(mute) {
+        createCTRLButtonSound(94, 94, '🔇', -10, 5, 'grey', 10, CTRLAreaMenu);
+    } else {
+        createCTRLButtonSound(94, 94, '🔊', -10, 5, 'grey', 10, CTRLAreaMenu);
+    }
+    
 }
 function buttonPress(typ) {
     if(typ == 'up') {
@@ -413,8 +479,6 @@ function ClearGameObjects() {
     }
     blocksB.length = 0;
     blocksB = [];
-    
-    //console.log('blocks[] now length: ' + blocks.length);
 
 }
 function ClearMenuObjects() {
@@ -439,7 +503,7 @@ function ClearMenuObjects() {
 //Menu State Setup
 function initMenuState() {
     console.log('init menu state');
-
+    
     //reset exit button
     // upBool = false;
     // dnBool = false;
@@ -545,6 +609,10 @@ function initMenuState() {
     //Todo, create and destroy depening on game scene???????????????????????????????
     createOffGameButtons();
     
+    //init music
+    if(!mute) {
+        muteOff();
+    } 
 
 }
 
@@ -558,6 +626,8 @@ function initGameState() {
     // lfBool = false;
     // riBool = false;
     qtBool = false;
+    mvSpdX = 0;
+    mvSpdY = 0;
 
     ClearMenuObjects();
 
@@ -654,13 +724,8 @@ const loop = GameLoop({
                 //reset
                 qtBool = false; 
                 
-                //go back 
-                //buttonPress('⎋');
-                
                 gameState = 0;
                 stateInit = true; //reinitialize
-                
-    
             }
         }
 
@@ -670,6 +735,7 @@ const loop = GameLoop({
             if(stateInit == true) {
                 stateInit = false;
                 initMenuState();
+
             }
 
         } else if (gameState == 1) { //GAME
@@ -691,12 +757,10 @@ const loop = GameLoop({
     render: () => {
 
         if(gameState == 0) { //MENU
-
             //Refresh
             if(stateInit == true) {
                 context.clearRect(0,0, canvas.width, canvas.height);
             }
-
             //render menu
             if(menuGrid) {
                 menuGrid.render();
