@@ -6,31 +6,23 @@
 //     zzfx(...[.7,.1,530,.08,.01,.3,2,.93,,.5,,,.15,5,,1,,.99,.001,.27]); // Explosion 30
 // }
 
-let init = true;
+import { sanxion } from '/assets/music/sanxion.js';
 
-let buffer;
-let node;
+import { sanxion2 } from '/assets/music/sanxion2.js';
 
-// Create a song
-//let mySongData = zzfxM(`./assets/music/sanxion.js`);
-// Play the song (returns a AudioBufferSourceNode)
-//let myAudioNode = zzfxP(...mySongData);
-// Stop the song
-//myAudioNode.stop();
+const songData = sanxion;
+const songData2 = sanxion2;
 
-    //zzfx(...[,,925,.04,.3,.6,1,.3,,6.27,-184,.09,.17]); // Game Over
+const buffer = zzfxM(...songData);
 
-    //zzfx(...[,,537,.02,.02,.22,1,1.59,-6.98,4.97]); // Heart
+//Play Song
+const node = zzfxP(...buffer);
 
-    //zzfx(...[1.5,.8,270,,.1,,1,1.5,,,,,,,,.1,.01]); // Piano
+//node.stop();
 
-    //zzfx(...[,,129,.01,,.15,,,,,,,,5]); // Drum
-
-
-// Later, play the sound
 //if (player.hit(enemy)) {
-if(init) {
+// if(init) {
  
-    
-    init = false;
-}
+
+//     init = false;
+// }
