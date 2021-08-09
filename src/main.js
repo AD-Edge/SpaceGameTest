@@ -66,7 +66,11 @@ var lfBool = false;
 var riBool = false;
 var qtBool = false;
 
-var mute = false;
+var firstStart = true;
+
+var gridSQRbutSound = null;
+
+var mute = true;
 
 //Load/Create Image Sprites
 const playerImg = new Image();
@@ -243,7 +247,7 @@ function createCTRLButtonTxt(xIn, yIn, txt, ox, oy, c, sSub) {
 }
 
 function createCTRLButtonSound(xIn, yIn, txt, ox, oy, c, sSub, parnt) {
-    const gridSQRbut = Button({
+    gridSQRbutSound = Button({
         x: xIn,
         y: yIn,
         color: c,
@@ -289,8 +293,8 @@ function createCTRLButtonSound(xIn, yIn, txt, ox, oy, c, sSub, parnt) {
             //buttonEnd(txt)
         }
     });
-    track(gridSQRbut);
-    parnt.addChild(gridSQRbut);
+    track(gridSQRbutSound);
+    parnt.addChild(gridSQRbutSound);
 }
 
 function createGameButtons() {
@@ -702,6 +706,24 @@ function initGameState() {
     //now load Game Buttons
     createGameButtons();
 
+}
+
+//Important!
+//Handle browser muting audio - triggers on canvas click
+//can this happen on mouse over insead?
+canvas.onclick = function() {
+    if(firstStart ) {
+        firstStart  = false;
+
+        sfxPlayButton();
+        //or another function to use audio source
+    
+        if(mute) {
+            mute = false;
+            muteOff();
+            gridSQRbutSound.text = '🔊';
+        }
+    }
 }
 
 //GameLoop setup

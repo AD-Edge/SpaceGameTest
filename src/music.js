@@ -12,22 +12,23 @@ export function muteOn() {
 }
 export function muteOff() {
     setVolume(0.09); //zzfx
-    buffer = zzfxM(...songData2);
     node = zzfxP(...buffer);
-
 }
+
+
 
 let node = null;
 
+
 import { sanxion } from '../assets/music/sanxion.js';
 import { sanxion2 } from '../assets/music/sanxion2.js';
-
-let buffer = null;
 
 const songData = sanxion;
 const songData2 = sanxion2;
 
 
+//load this to avoid delay 
+let buffer = zzfxM(...songData2);
 
 //Play Song
 //node.stop();
