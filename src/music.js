@@ -7,11 +7,14 @@
 // }
 
 export function muteOn() {
+    setVolume(0); //zzfx
     node.stop();
 }
 export function muteOff() {
+    setVolume(0.09); //zzfx
     buffer = zzfxM(...songData2);
     node = zzfxP(...buffer);
+
 }
 
 let node = null;

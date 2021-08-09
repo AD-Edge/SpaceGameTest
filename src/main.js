@@ -260,7 +260,6 @@ function createCTRLButtonSound(xIn, yIn, txt, ox, oy, c, sSub, parnt) {
         },
         onDown() {
             //timerQ = 0.75; //set delay for transition
-            sfxPlayButton(); //sfx
             this.color = 'grey'
             
             if(!mute) {
@@ -271,9 +270,11 @@ function createCTRLButtonSound(xIn, yIn, txt, ox, oy, c, sSub, parnt) {
                 //console.log('mute');
                 this.text = '🔊';
                 muteOff();
-                mute = false;
-                
+                mute = false;    
             }
+
+            sfxPlayButton(); //sfx
+            
         },
         onUp() {
             this.color = c

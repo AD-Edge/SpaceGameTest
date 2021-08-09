@@ -1,3 +1,8 @@
+
+function setVolume(vol) {
+    zzfxV = vol;
+}
+
 // zzfx() - the universal entry point -- returns a AudioBufferSourceNode
 zzfx=(...t)=>zzfxP(zzfxG(...t))
 
