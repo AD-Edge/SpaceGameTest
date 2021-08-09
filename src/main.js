@@ -13,7 +13,8 @@ this is likely what ill do for js13k to save on files/data...
 
 //for later, dynamic resize?
 //canvasObject.setAttribute('width', '475');
-import { sfxPlayButton, sfxPlayPuff } from './music.js';
+
+//import { sfxPlayButton, sfxPlayPuff } from './music.js';
 
 const { init, GameLoop, Button, Text, Grid, 
   SpriteSheet, Sprite, initPointer, track } = kontra;
@@ -43,6 +44,7 @@ var numCols = canvas.width / grid;
 
 //Array for blocks
 var blocks = [];
+var blocksB = [];
 
 //Scene stuff
 var timer = 0;
@@ -306,18 +308,18 @@ function buttonActions() {
 }
 
 //Create falling particles
-function createFallBlock() {
+function createFallBlock(array, d) {
 
     const block = Sprite({
         type: 'block',
         x: Math.floor(Math.random() * canvas.width) + 1,
         y: 0,
         color: 'white',
-        width: 4,
-        height: 4,
+        width: d,
+        height: d,
         dy: Math.random() * 1 + .25,
     });
-    blocks.push(block);
+    array.push(block);
     //console.log(block); 
 }
 
@@ -331,6 +333,16 @@ function GameUpdate() {
 
         if(block.y > canvas.height/2) {
             block.y = -block.height;
+            block.x = Math.floor(Math.random() * canvas.width) + 1;
+        }
+
+    });
+
+    blocksB.map(block => {
+        block.update();
+
+        if(block.y > canvas.height/2) {
+            block.y = -block.height/2;
             block.x = Math.floor(Math.random() * canvas.width) + 1;
         }
 
@@ -392,6 +404,15 @@ function ClearGameObjects() {
     }
     blocks.length = 0;
     blocks = [];
+
+    
+    for (var i = 0; i <= blocksB.length - 1; i++) {
+        //console.log('removing object from blocks');
+        blocksB[i].isActive = false;
+        //blocks[i].remove();
+    }
+    blocksB.length = 0;
+    blocksB = [];
     
     //console.log('blocks[] now length: ' + blocks.length);
 
@@ -598,8 +619,13 @@ function initGameState() {
     playerSprite.addChild(rSprite);
 
     //generate falling blocks
-    for (let i=0; i < 5; i++) {
-        createFallBlock();
+    for (let i=0; i < 4; i++) {
+        createFallBlock(blocks, 4);
+    }
+
+    //generate falling blocks below
+    for (let i=0; i < 7; i++) {
+        createFallBlock(blocksB, 2);
     }
     
     //now load Game Buttons
@@ -680,6 +706,7 @@ const loop = GameLoop({
                 CTRLAreaMenu.render(); 
             }
         } else if (gameState == 1) { //GAME
+            blocksB.map(block => block.render());
             
             //Refresh
             if(stateInit == true) {
@@ -713,6 +740,9 @@ const loop = GameLoop({
 loop.start();
 
 
+///////////////////////////
+//Extra Keys
+///////////////////////////
 
 //Mute
 document.onkeypress = function(evt) {
@@ -724,3 +754,15 @@ document.onkeypress = function(evt) {
         //muteMusic()
     }
 };
+
+
+///////////////////////////
+//SFX 
+///////////////////////////
+function sfxPlayButton() {
+    zzfx(...[,,200,.01,,.20,,,,,,,,0]); // Button
+}
+
+function sfxPlayPuff() {
+    zzfx(...[.7,.1,530,.08,.01,.3,2,.93,,.5,,,.15,5,,1,,.99,.001,.27]); // Smoke Puff
+}
