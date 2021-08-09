@@ -13,6 +13,7 @@ this is likely what ill do for js13k to save on files/data...
 
 //for later, dynamic resize?
 //canvasObject.setAttribute('width', '475');
+import { sfxPlayButton, sfxPlayPuff } from './music.js';
 
 const { init, GameLoop, Button, Text, Grid, 
   SpriteSheet, Sprite, initPointer, track } = kontra;
@@ -35,6 +36,8 @@ var rocketSheet = null;
 var rSprite = null;
 var grid = 8;
 var mvSpd = 0.6;
+var mvSpdX = 0;
+var mvSpdY = 0;
 var numRows = canvas.height / grid;
 var numCols = canvas.width / grid;
 
@@ -114,8 +117,13 @@ function buttonRender(ct, id) {
       // pressed by mouse, touch, or enter/space on keyboard
       if (ct.pressed) {  
         ct.textNode.color = 'black';
+        if(timer <= 0) { // only plays once
+            sfxPlayButton(); //sfx
+        }
+
         timer = 0.25; //set delay for transition
         sceneChange = id; //trigger transition to scene [id]
+        
       }
       // hovered by mouse
       else if (ct.hovered) {
@@ -207,6 +215,7 @@ function createCTRLButtonTxt(xIn, yIn, txt, ox, oy, c, sSub) {
             qtBool = true;
             timerQ = 0.75; //set delay for transition
             this.color = 'grey'
+            sfxPlayButton(); //sfx
             //buttonPress(txt) //moved to gameloop
             //this.y +=2;
         },
@@ -269,17 +278,25 @@ function buttonEnd(typ) {
         qtBool = false;
     }
 }
-function buttonActions(typ) {
+function buttonActions() {
     if(upBool == true) {
-        playerSprite.y -= mvSpd;
+        mvSpdY -= 0.1;
+        playerSprite.dy = mvSpdY;
     } 
     else if (dnBool == true) {
-        playerSprite.y += mvSpd;
+        mvSpdY += 0.1;
+        playerSprite.dy = mvSpdY;
     } else if (lfBool == true) {
-        playerSprite.x -= mvSpd;
+        mvSpdX -= 0.1;
+        playerSprite.dx = mvSpdX;
     } else if (riBool == true) {
-        playerSprite.x += mvSpd;
+        mvSpdX += 0.1;
+        playerSprite.dx = mvSpdX;
     } 
+
+    if(upBool || dnBool || lfBool || riBool) {
+        sfxPlayPuff();
+    }
     //else if (qtBool == true) {
     //     //switch game state back
     //     gameState = 0;
@@ -323,15 +340,23 @@ function GameUpdate() {
         playerSprite.update();
 
         if(kontra.keyPressed('left')) {
-            playerSprite.x -= mvSpd;
-        } else if (kontra.keyPressed('right')) {
-            playerSprite.x += mvSpd;
+            mvSpdX -= 0.1;
+            playerSprite.dx = mvSpdX;
+            sfxPlayPuff();
         }
-
+        if (kontra.keyPressed('right')) {
+            mvSpdX += 0.1;
+            playerSprite.dx = mvSpdX;
+            sfxPlayPuff();
+        }
         if(kontra.keyPressed('up')) {
-            playerSprite.y -= mvSpd;
+            mvSpdY -= 0.1;
+            playerSprite.dy = mvSpdY;
+            sfxPlayPuff();
         } else if (kontra.keyPressed('down')) {
-            playerSprite.y += mvSpd;
+            mvSpdY += 0.1;
+            playerSprite.dy = mvSpdY;
+            sfxPlayPuff();
         }
 
         if(playerSprite.x < 0 - playerSprite.width) {
@@ -414,7 +439,7 @@ function initMenuState() {
         render() {
             this.context.setLineDash([]);
             this.context.lineWidth = 3;
-            this.context.strokeStyle = 'grey';
+            this.context.strokeStyle = 'black';
             this.context.strokeRect(0, 0, this.width, this.height);
         }
     });
@@ -525,7 +550,7 @@ function initGameState() {
         render() {
             this.context.setLineDash([]);
             this.context.lineWidth = 3;
-            this.context.strokeStyle = 'grey';
+            this.context.strokeStyle = 'black';
             this.context.strokeRect(0, 0, this.width, this.height);
         }
     });
@@ -545,8 +570,8 @@ function initGameState() {
         x: 50,
         y: 80,
         image: playerImg,
-        dx: 0,
-        dy: 0,
+        dx: mvSpdX,
+        dy: mvSpdY,
     });
 
     rocketSheet = SpriteSheet({
@@ -686,3 +711,16 @@ const loop = GameLoop({
 
 //Kick off the gameloop
 loop.start();
+
+
+
+//Mute
+document.onkeypress = function(evt) {
+    evt = evt || window.event;
+    var charCode = evt.keyCode || evt.which;
+    var charStr = String.fromCharCode(charCode);
+    if (charStr == "m" || charStr == "M") {
+        console.log("mute toggle triggered");
+        //muteMusic()
+    }
+};
