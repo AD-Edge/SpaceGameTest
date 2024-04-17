@@ -1,4 +1,7 @@
 # SpaceGameTest
+
+![IMGDEMO](/screenshots/spacegame_2.gif)
+
 Lightweight space game, learning Kontra.js & javascript for gamedev.
 Works on mobile & browser.
 
