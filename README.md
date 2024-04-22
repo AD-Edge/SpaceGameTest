@@ -2,6 +2,8 @@
 
 ![IMGDEMO](/screenshots/spacegame_2.gif)
 
+<sub>[Demo/GIF]</sub>
+
 Lightweight space game, learning Kontra.js & javascript for gamedev.
 Works on mobile & browser.
 
