@@ -1,6 +1,7 @@
 # SpaceGameTest
 
 ![IMGDEMO](/screenshots/spacegame_2.gif)
+*image_caption*
 
 <sub>[Demo/GIF]</sub>
 
