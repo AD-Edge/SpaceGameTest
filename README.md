@@ -1,9 +1,8 @@
 # SpaceGameTest
 
-![IMGDEMO](/screenshots/spacegame_2.gif)
-*image_caption*
-
-<sub>[Demo/GIF]</sub>
+| ![IMGDEMO](/screenshots/spacegame_2.gif) | 
+|:--:| 
+| *[Demo/GIF]* |
 
 Lightweight space game, learning Kontra.js & javascript for gamedev.
 Works on mobile & browser.
